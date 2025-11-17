@@ -2,10 +2,8 @@ import { AnalyticsWrapper } from "@/lib/components/shared/AnalyticsWrapper";
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
-import Script from "next/script";
 import { cn } from "@heroui/react";
-import { getCurrentAuthUser } from "@/lib/supabase/server";
-import { User } from "@supabase/supabase-js";
+import { ThemeScript } from "@/lib/components/shared/ThemeScript";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -23,20 +21,14 @@ export default async function RootLayout({
 }: {
   children: React.ReactNode;
 }) {
-
-  let user: User | undefined = undefined;
-
-  try {
-    user = await getCurrentAuthUser();
-  } catch (error) {
-    console.error(error);
-  }
-
   return (
-    <html lang="en" className="dark">
-      <body className={cn("bg-neutral-900",inter.className)}>
+    <html lang="en" suppressHydrationWarning>
+      <body className={cn("bg-theme-background", inter.className)}>
+        <ThemeScript />
         {children}
-        <AnalyticsWrapper gaId={process.env.NEXT_PUBLIC_GOOGLE_ANALYTICS_ID ?? ""} user={user} />
+        <AnalyticsWrapper
+          gaId={process.env.NEXT_PUBLIC_GOOGLE_ANALYTICS_ID ?? ""}
+        />
       </body>
     </html>
   );

@@ -30,17 +30,17 @@ export default function Footer() {
             </HeroUILink>
             <HeroUILink
               as={Link}
-              href="/setup"
+              href="/about"
               className="text-theme-text-secondary hover:text-theme-text transition-colors text-sm"
             >
-              Setup
+              About
             </HeroUILink>
             <HeroUILink
               as={Link}
-              href="/dashboard"
+              href="/protected"
               className="text-theme-text-secondary hover:text-theme-text transition-colors text-sm"
             >
-              Dashboard
+              Protected
             </HeroUILink>
           </nav>
 

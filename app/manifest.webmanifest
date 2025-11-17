@@ -5,7 +5,7 @@
   "start_url": "/",
   "author": "element-software.co.uk",
   "display": "standalone",
-  "background_color": "#171717",
+  "background_color": "#F9FAFB",
   "theme_color": "#f59e0b",
   "icons": [
     { "src": "/icon.svg", "sizes": "any", "type": "image/svg+xml" }

@@ -1,12 +1,23 @@
 import { NextResponse } from 'next/server';
 import { NextRequest } from 'next/server';
 import { SupabaseMiddleware } from '@/lib/supabase';
+import { isSupabaseConfigured } from '@/lib/supabase/config';
 
 export async function middleware(request: NextRequest) {
   const pathname = request.nextUrl.pathname;
 
+  // If Supabase is not configured, skip auth checks (demo mode)
+  if (!isSupabaseConfigured()) {
+    return NextResponse.next();
+  }
+
   // Create Supabase client for auth state
   const { supabase, response } = SupabaseMiddleware.createClient(request);
+  
+  if (!supabase) {
+    return response;
+  }
+
   const {
     data: { user },
   } = await supabase.auth.getUser();

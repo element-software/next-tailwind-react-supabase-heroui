@@ -2,8 +2,13 @@
 import Image from "next/image";
 import Link from "next/link";
 import { Button, Link as HeroUILink } from "@heroui/react";
+import { ThemeToggle } from "./ThemeToggle";
 
-export default function Header() {
+export interface HeaderProps {
+ public?: boolean;
+}
+
+export default function Header({ public: isPublic }: HeaderProps) {
   return (
     <header className="sticky top-0 z-50 w-full border-b border-theme-border bg-theme-background/80 backdrop-blur-sm">
       <div className="container mx-auto px-4">
@@ -30,29 +35,42 @@ export default function Header() {
             </HeroUILink>
             <HeroUILink
               as={Link}
-              href="/setup"
+              href="/about"
               className="text-theme-text-secondary hover:text-theme-text transition-colors"
             >
-              Setup
+              About
             </HeroUILink>
             <HeroUILink
               as={Link}
-              href="/dashboard"
+              href="/protected"
               className="text-theme-text-secondary hover:text-theme-text transition-colors"
             >
-              Dashboard
+              Protected
             </HeroUILink>
           </nav>
 
-          {/* Login Button */}
-          <Button
-            as={Link}
-            color="primary"
-            href="/auth/login"
-            className="ml-4"
-          >
-            Login
-          </Button>
+          {/* Right side actions */}
+          <div className="flex items-center gap-3">
+            <ThemeToggle />
+            
+            {isPublic ? ( 
+              <Button
+              as={Link}
+              color="primary"
+              href="/auth/login"
+            >
+              Login
+            </Button>
+            ) : (
+              <Button
+                as={Link}
+                color="primary"
+                href="/auth/login"
+              >
+                Logout
+              </Button>
+            )}
+          </div>
         </div>
       </div>
     </header>

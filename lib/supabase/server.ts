@@ -1,8 +1,13 @@
 "use server"
 import { createServerClient } from '@supabase/ssr'
 import { cookies } from 'next/headers'
+import { isSupabaseConfigured } from './config'
 
 export async function createClient() {
+  if (!isSupabaseConfigured()) {
+    return null as any
+  }
+
   const cookieStore = await cookies()
 
   return createServerClient(
@@ -30,10 +35,15 @@ export async function createClient() {
 }
 
 export async function getCurrentAuthUser() {
-  const supabase = await createClient()
-  const { data: { user } } = await supabase.auth.getUser()
-  if (!user) {
-    throw new Error("Unauthorized");
+  if (!isSupabaseConfigured()) {
+    return null
   }
-  return user
+  
+  const supabase = await createClient()
+  if (!supabase) {
+    return null
+  }
+  
+  const { data: { user } } = await supabase.auth.getUser()
+  return user || null
 }

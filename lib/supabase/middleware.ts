@@ -1,5 +1,6 @@
 import { createServerClient } from '@supabase/ssr'
 import { NextRequest, NextResponse } from 'next/server'
+import { isSupabaseConfigured } from './config'
 
 export function createClient(request: NextRequest) {
   let response = NextResponse.next({
@@ -7,6 +8,14 @@ export function createClient(request: NextRequest) {
       headers: request.headers,
     },
   })
+
+  if (!isSupabaseConfigured()) {
+    // Return a mock supabase client and response when not configured
+    return { 
+      supabase: null as any, 
+      response 
+    }
+  }
 
   const supabase = createServerClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,

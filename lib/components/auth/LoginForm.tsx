@@ -1,28 +1,43 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useSearchParams } from "next/navigation";
 import { Button, Card, CardBody } from "@heroui/react";
 import Icon from "@mdi/react";
-import { mdiGoogle } from "@mdi/js";
+import { mdiGoogle, mdiInformation } from "@mdi/js";
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/client";
 import Image from "next/image";
 
-export async function LoginForm() {
+export function LoginForm() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [isConfigured, setIsConfigured] = useState<boolean | null>(null);
 
   const searchParams = useSearchParams();
   const redirectTo = searchParams.get("redirectTo") || "/setup";
 
-  const supabase = await createClient();
+  useEffect(() => {
+    // Check if Supabase is configured
+    const supabase = createClient();
+    setIsConfigured(supabase !== null);
+  }, []);
 
   const handleGoogleSignIn = async () => {
+    if (!isConfigured) {
+      setError("Authentication is not configured. Please set up Supabase credentials.");
+      return;
+    }
+
     setLoading(true);
     setError(null);
 
     try {
+      const supabase = createClient();
+      if (!supabase) {
+        throw new Error("Supabase client is not available");
+      }
+
       const { error } = await supabase.auth.signInWithOAuth({
         provider: "google",
         options: {
@@ -42,12 +57,12 @@ export async function LoginForm() {
       {/* Left side - Logo */}
       <div className="flex w-full md:w-1/2 items-center justify-center md:pr-4 border-r border-theme-border">
         <div className="text-center flex flex-col items-center justify-center max-w-md py-4 px-8">
-          <Image src="/logo.svg" alt="App Logo" width={100} height={100} />
+          <Image src="/next.svg" alt="App Logo" width={100} height={100} />
           <h1 className="text-3xl font-bold text-theme-text mt-8 mb-4">
             Welcome to App
           </h1>
           <p className="text-theme-text text-lg">
-            Your smart home dashboard, simplified and beautiful.
+            You can sign in with your Google account to continue.
           </p>
           <Button
             className="mt-4"
@@ -72,6 +87,19 @@ export async function LoginForm() {
               </div>
 
               <div className="space-y-6">
+                {isConfigured === false && (
+                  <div className="bg-warning-50 border border-warning-200 text-warning-700 px-4 py-3 rounded-lg text-sm flex items-start gap-2">
+                    <Icon path={mdiInformation} className="w-5 h-5 shrink-0 mt-0.5" />
+                    <div>
+                      <p className="font-medium mb-1">Authentication not configured</p>
+                      <p className="text-xs">
+                        To enable authentication, please configure your Supabase credentials in your environment variables.
+                        See the README for setup instructions.
+                      </p>
+                    </div>
+                  </div>
+                )}
+
                 {error && (
                   <div className="bg-danger-50 border border-danger-200 text-danger-700 px-4 py-3 rounded-lg text-sm">
                     {error}
@@ -82,7 +110,7 @@ export async function LoginForm() {
                   onPress={handleGoogleSignIn}
                   color="primary"
                   className="w-full font-medium"
-                  isDisabled={loading}
+                  isDisabled={loading || isConfigured === false}
                 >
                   {loading ? (
                     "Signing in..."
